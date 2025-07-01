@@ -39,17 +39,23 @@ Para este caso de uso específico, foram exportados dados de uma plataforma inte
         ```bash
         gcloud auth login
         ```
+    - Selecione o e-mail da AvenueCode, que possui as devidas permissões dentro da GCP
 - Caso de uso em mente
-    - Como será feita a extração desses dados e se é possível  
-    - O quanto esses dados terão de ser transformados  
-    - Qual a massa de dados (tamanho - GiBs) que será usada  
+    - Como será feita a extração desses dados e se é possível
+        - Via api? Bulk de dados?
+    - O quanto esses dados terão de ser transformados
+        - Qual o nível que esses dados se encontram?
+            - Bronze -> dados brutos.
+            - Silver -> dados brutos, porém parcialmente tratados.
+            - Gold -> dados tratados e pronto para uso. 
+    - Qual a massa de dados (tamanho - GiBs) que será usada
 
 ## Importante
 
 O **Agent Space** é uma ferramenta que, ao realizar a busca dentro do Data Store, opera por meio de **busca semântica**, e não por meio de query SQL.  
-Por essa razão, a estrutura exige **uma linha por entidade**.  
+Por essa razão, recomenda-se **uma linha por entidade**.  
 
-Caso haja a necessidade de mais de uma linha por entidade, é recomendado o uso de **arrays**, como no exemplo abaixo:
+Caso haja mais de uma linha por entidade dentro do dataset, é recomendado o uso de **arrays**, como no exemplo abaixo:
 
 ### Tabela original
 
@@ -76,8 +82,12 @@ Para este caso de uso:
 
 1. Os dados foram exportados manualmente do **MongoDB** no formato `.bson`.
 2. Em seguida, utilizou-se **Python** para realizar a transformação dos dados, conforme as recomendações definidas previamente.
-3. Após as transformações, os dados foram carregados no **BigQuery** utilizando a biblioteca `pandas-gbq` para ingestão.
-4. A autenticação e o gerenciamento de permissões foram realizados com a ferramenta **gcloud**, utilizando as credenciais do usuário responsável.
+    - Os dados, que estavam originalmente em formato desestruturado (bson), foram transformados em um formato estruturado e tabular (dataset).
+    - Os dados dentro do dataset foram tratados conforme as boas práticas de engenharia de dados, como a padronização de formatos, tratamento de valores ausentes, normalização de campos e validação de consistência entre registros.
+    - Os dados que se repetiam por entidade foram consolidados em arrays por campo seguindo as recomendações previamente definidas acima.
+3. A autenticação e o gerenciamento de permissões foram realizados com a ferramenta **gcloud**, utilizando as credenciais do usuário responsável.
+    - ```gcloud auth login``` para realizar a autenticação
+4. Após as transformações, os dados foram carregados no **BigQuery** utilizando a biblioteca `pandas-gbq` para ingestão.
 5. Para a criação do DataStore, foi definido o esquema dos dados, incluindo tipos de campo, propriedades de indexação, se o campo é um array, e outras características importantes para otimização de consultas e busca.
     - As principais propriedades configuradas no DataStore são:
         - **Field name**: nome do campo.

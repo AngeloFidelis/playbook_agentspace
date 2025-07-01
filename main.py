@@ -95,14 +95,15 @@ def transform_data(data_users):
 
     # Converte a lista de dicionários para um DataFrame
     df_users = pd.DataFrame(rows)
+    print(df_users.dtypes)
     return df_users
     
     #função para carregar os dados no BigQuery e salvar uma cópia local em CSV
 def load_data(df_users):
     df_users.to_csv('users.csv', index=None)
     
-    path_table_projects = ".".join([data_set_name, tabela_name])
-    gbq.to_gbq(df_users, path_table_projects,project_id=project_id, if_exists='replace')
+    # path_table_projects = ".".join([data_set_name, tabela_name])
+    # gbq.to_gbq(df_users, path_table_projects,project_id=project_id, if_exists='replace')
     
     
 
