@@ -8,7 +8,48 @@ Serão detalhadas todas as etapas, desde o processo de **ETL (Extract, Transform
 
 Para este caso de uso específico, foram exportados dados de uma plataforma interna chamada **Superstar**, que contém informações sobre os profissionais da empresa, incluindo habilidades, certificações obtidas, experiências de trabalho, entre outros. A exportação foi realizada no formato **.bson** (formato binário utilizado pelo MongoDB) e transformados utilizando Python, estruturando-os de uma maneira mais adequada antes de serem carregados no BigQuery.
 
-## Escopo
+## Serviços GCP
+
+### BigQuery
+O BigQuery é um serviço de armazenamento e análise de dados (Big data) da Google (também conhecido como data warehouse) sem servidor que pode ser escalonado de acordo com seus dados. 
+
+Entenda esse serviço como um banco de dados de banco de dados, permitindo conectar diversas fontes de dados e centralizar as informações. 
+
+O BigQuery pode armazenar petabytes de dados, o que o torna ideal para empresas que trabalham com grandes conjuntos de dados. Esses dados são armazenados de forma organizada em tabelas, permitindo análises estruturadas (oferecendo suporte a consultas utilizando o SQL).
+
+Também é possível analisar petabytes de dados usando velocidades incrivelmente rápidas sem sobrecarga operacional
+
+### Cloud Storage
+Cloud Storage é o serviço de armazenamento de objetos da GCP, conhecido como Data Lake. Ele permite armazenar arquivos de qualquer tipo e tamanho, como imagens, vídeos, backups, dados brutos, arquivos CSV, JSON etc.
+
+O Cloud Storage funciona como um sistema de arquivos e pastas no Windows. Tenho o diretório raiz, onde posso criar pastas e sub pastas e armazenar qualquer tipo de arquivos.
+
+> Embora o modelo de 'pastas' no Cloud Storage seja apenas ilustrativo — já que na prática tudo funciona por meio de paths (caminhos) — ele ajuda na compreensão e organização visual dos arquivos.
+
+O Cloud Storage armazena os objetos dentro de Buckets, que pode ser entendido como uma espécie de “caixa” onde os arquivos (objetos) são armazenados em nuvem. Cada bucket é isolado um do outro, cujo nome deve ser único e global. Os buckets podem ser regionais ou multi-regionais
+
+### gcloud
+O gcloud é a ferramenta de linha de comando oficial da GCP, permitindo interagir com os recursos via terminal. 
+
+Quando você está desenvolvendo em ambiente local (como seu computador) e quer usar SDKs da GCP (ex: BigQuery, Storage, etc.) é necessário credenciais válidas.
+
+Ao executar o comando ```gcloud auth application-default login```, as credenciais da conta ativa são armazenadas localmente como padrão, permitindo que os SDKs do Google acessem essas credenciais a partir de um caminho padrão, como:
+```
+~/.config/gcloud/application_default_credentials.json
+```
+
+Alguns outros comandos incluem:
+```sh
+gcloud auth login #Autentica o terminal (CLI) com sua conta Google
+gcloud auth application-default login #Autentica o ambiente local para uso com bibliotecas (SDKs) como Python, Node.js, etc.
+gcloud config set project [ID_DO_PROJETO] #Define qual projeto será usado como padrão nos comandos gcloud.
+gcloud config get-value project #Mostra qual projeto está atualmente configurado no ambiente local.
+gcloud auth list #Lista todas as contas autenticadas no ambiente local 
+gcloud config set account [account] #Define a conta ativa no ambiente local para comandos gcloud
+gcloud config list #Exibe todas as configurações ativas
+```
+
+## Escopo do caso de uso
 
 - **Fonte de dados:** BigQuery
 - Ferramentas utilizadas
@@ -37,9 +78,11 @@ Para este caso de uso específico, foram exportados dados de uma plataforma inte
 - Autenticação com o Google através do gcloud
     - Execute o utilitário da seguinte forma em seu terminal: 
         ```bash
-        gcloud auth login
+        gcloud auth application-default login
+        gcloud config set project 'agentspace-trial-na'
         ```
     - Selecione o e-mail da AvenueCode, que possui as devidas permissões dentro da GCP
+    - A partir desse ponto, podemos usar as credenciais de usuário para estabelecer a conexão entre o ambiente local e a GCP
 - Caso de uso em mente
     - Como será feita a extração desses dados e se é possível
         - Via api? Bulk de dados?
@@ -86,7 +129,7 @@ Para este caso de uso:
     - Os dados dentro do dataset foram tratados conforme as boas práticas de engenharia de dados, como a padronização de formatos, tratamento de valores ausentes, normalização de campos e validação de consistência entre registros.
     - Os dados que se repetiam por entidade foram consolidados em arrays por campo seguindo as recomendações previamente definidas acima.
 3. A autenticação e o gerenciamento de permissões foram realizados com a ferramenta **gcloud**, utilizando as credenciais do usuário responsável.
-    - ```gcloud auth login``` para realizar a autenticação
+    - ```gcloud auth application-default login``` para realizar a autenticação
 4. Após as transformações, os dados foram carregados no **BigQuery** utilizando a biblioteca `pandas-gbq` para ingestão.
 5. Para a criação do DataStore, foi definido o esquema dos dados, incluindo tipos de campo, propriedades de indexação, se o campo é um array, e outras características importantes para otimização de consultas e busca.
     - As principais propriedades configuradas no DataStore são:

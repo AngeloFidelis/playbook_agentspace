@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 rows = []
 
 # Nome do projeto, dataset e da tabela de destino dos dados
-data_set_name = "superstar_users_v1"
-tabela_name = 'users'
-project_id = 'agentspace-trial-453014'
+data_set_name = "agent_space_data_1p"
+tabela_name = '' #definir com base no caso de uso.
+project_id = 'agentspace-trial-na'
 
 # função para extrair os dados do arquivo BSON
 def extract_data(path):
@@ -102,8 +102,8 @@ def transform_data(data_users):
 def load_data(df_users):
     df_users.to_csv('users.csv', index=None)
     
-    # path_table_projects = ".".join([data_set_name, tabela_name])
-    # gbq.to_gbq(df_users, path_table_projects,project_id=project_id, if_exists='replace')
+    path_table_projects = ".".join([data_set_name, tabela_name])
+    gbq.to_gbq(df_users, path_table_projects,project_id=project_id, if_exists='replace')
     
     
 
